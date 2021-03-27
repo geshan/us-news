@@ -3,37 +3,33 @@ import logo from './logo.svg';
 import './App.css';
 
 const App = () => {
-  const [message, setMessage] = useState('...loading')
-
+  const [stories, setStories] = useState([]);
+  const [message, setMessage] = useState('loading...');
   useEffect(() => {
-    async function fetchData () {
+    async function fetchNewsStories () {
       try {
-        let data = await (await fetch('/api')).json()
-        setMessage(data.message)
+        await (await fetch('/api/fetch-news')).json();
+        const data = await (await fetch('/api/news')).json();
+        setStories(data)
+        const message = data.length ? '' : 'No stories found';
+        setMessage(message);
       } catch (err) {
-        setMessage(err.message)
+        console.log(`err: ${err.mesasge}`, err);
+        setMessage('could not fetch stories');
       }
     }
-    fetchData()
-  })
+    fetchNewsStories()
+  }, []);
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>{message}</p>
-        <p>Change me!</p>
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h2>Latest News</h2>
+        {message}
+        <div className="stories">
+          {Array.isArray(stories) && stories.map(story => <h3><a href={story.url} target="_blank" rel="noreferrer">{story.headline}</a> - {story.source}</h3>)}
+        </div>
       </header>
     </div>
   );
