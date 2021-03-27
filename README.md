@@ -1,2 +1,0 @@
-# us-news
-Begin app
